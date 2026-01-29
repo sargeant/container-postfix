@@ -32,6 +32,10 @@ spec:
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           {{- with .Values.securityContext }}
@@ -153,6 +157,9 @@ spec:
               mountPath: /etc/postfix/{{ .existingSecretKey }}
           {{- end }}
           {{- end }}
+          {{- with .Values.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
         - name: exporter
           image: ghcr.io/hsn723/postfix_exporter
           imagePullPolicy: IfNotPresent
@@ -219,6 +226,9 @@ spec:
         - name: {{ $secretName }}
           secret:
             secretName: {{ $secretName }}
+        {{- end }}
+        {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
 
       {{- with .Values.nodeSelector }}
